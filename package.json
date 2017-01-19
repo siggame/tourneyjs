@@ -1,0 +1,44 @@
+{
+  "name": "tourneyjs",
+  "version": "0.0.1",
+  "description": "Tournament algorithms",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "pretest": "npm run build",
+    "test": "mocha test/",
+    "build": "tsc",
+    "setup": "npm install",
+    "clean": "npm run clean:src && npm run clean:test",
+    "clean:src": "rm -rf src/*.js src/**/*.js",
+    "clean:test": "rm -rf test/*.js  test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siggame/tourneyjs.git"
+  },
+  "keywords": [
+    "tournament",
+    "triple-elimination",
+    "elimination",
+    "swiss-tournament",
+    "swiss",
+    "single-elimination"
+  ],
+  "author": "siggame",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siggame/tourneyjs/issues"
+  },
+  "homepage": "https://github.com/siggame/tourneyjs#readme",
+  "devDependencies": {
+    "@types/mocha": "^2.2.38",
+    "@types/node": "^7.0.0",
+    "@types/should": "^8.1.30",
+    "typescript": "^2.1.5"
+  },
+  "dependencies": {
+    "mocha": "^3.2.0",
+    "should": "^11.1.2"
+  }
+}
