@@ -44,8 +44,8 @@ class Match {
 }
 
 export class Bracket {
-    private dep: Bracket;
     private root: Match;
+    public dep: Bracket;
     public matches: Match[];
     public ready: [number, Match][];
 
