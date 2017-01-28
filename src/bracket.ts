@@ -30,13 +30,13 @@
  */
 
 class Match {
-    public teams: {};
+    public teams: any[];
     public next: Match[];
     public deps: Match[];
     public meta_data: {};
 
     constructor() {
-        this.teams = {};
+        this.teams = [];
         this.next = null;
         this.deps = null;
         this.meta_data = {};
@@ -44,15 +44,14 @@ class Match {
 }
 
 export class Bracket {
-    private root: Match;
+    public root: Match;
     public dep: Bracket;
     public matches: Match[];
-    public ready: [number, Match][];
 
     constructor(num_teams: number) {
-        let leaves = Math.floor(Math.log2(num_teams / 2));
+        let leaves = Math.ceil(Math.log2(num_teams / 2));
 
-        if (leaves !== Math.log2(num_teams / 2)) {
+        if (leaves !== Math.log2(num_teams / 2) || leaves == 0) {
             leaves += 1;
         }
 

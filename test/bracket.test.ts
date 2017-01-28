@@ -7,7 +7,7 @@ describe('Bracket', function () {
         done();
     });
 
-    it('should depend_on', (done) => {
+    it('should have root with no next match(es)', (done) => {
         const t = new tourney.Bracket(8);
         should(t.matches[0].next).be.equal(null);
         done();
