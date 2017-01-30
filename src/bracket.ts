@@ -39,7 +39,7 @@ class Match {
         this.teams = [];
         this.next = null;
         this.deps = null;
-        this.meta_data = {};
+        this.meta_data = null;
     }
 }
 

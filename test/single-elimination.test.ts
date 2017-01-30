@@ -20,20 +20,25 @@ describe('Single Elimination', () => {
     });
 
     it('should be playable', (done) => {
-        const t = new tourney.SingleElimination(["abc", "def", "ghi", "lmn", "opq"], false);
-        t.play(undefined);
+        const t = new tourney.SingleElimination(Array(10000).fill(null), false);
+        t.play((team_a, team_b) => {
+            return Math.floor(Math.random() * 2) == 0 ?
+                { "winner": team_a, "loser": team_b } : { "winner": team_b, "loser": team_a };
+        });
         should(t.playing).not.be.empty;
         done();
     });
 
     it('should finish tournament', (done) => {
-        const t = new tourney.SingleElimination(Array(1000).fill(null), false);
-        while (t.ready.length > 0) {
-            t.play(null);
-        }
-        should(t.ready).be.empty();
-        should(t.queued).be.empty();
-        done();
+        const t = new tourney.SingleElimination(Array(10000).fill(null), false);
+        t.once('on_finished', () => {
+            should(t.ready).be.empty();
+            done();
+        });
+        t.play((team_a, team_b) => {
+            return Math.floor(Math.random() * 2) == 0 ?
+                { "winner": team_a, "loser": team_b } : { "winner": team_b, "loser": team_a };
+        });
     });
 });
 

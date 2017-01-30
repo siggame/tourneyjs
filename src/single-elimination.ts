@@ -1,12 +1,14 @@
 import { Bracket } from "./bracket";
 import { permute } from "./permute";
+import { EventEmitter } from "events";
 
 export class SingleElimination {
     private bronze_final: Bracket;
-    private winners: Bracket;
     public playing: any[];
-    public queued: any[];
     public ready: any[];
+    public results: any[];
+    private tournament_events: EventEmitter;
+    private winners: Bracket;
 
     constructor(teams: any[], randomize: boolean) {
         if (teams.length == 0) {
@@ -17,10 +19,11 @@ export class SingleElimination {
         }
 
         this.bronze_final = new Bracket(2);
+        this.tournament_events = new EventEmitter();
         this.winners = new Bracket(teams.length);
         this.playing = [];
-        this.queued = [];
         this.ready = [];
+        this.results = [this.winners.root, this.bronze_final.root];
 
         this.bronze_final.dep = this.winners;
         this.bronze_final.root.deps = this.winners.root.deps;
@@ -51,6 +54,7 @@ export class SingleElimination {
             }
         });
 
+        // remove matches which are effectively "bye"s
         let completed = 0;
 
         Array(this.ready.length).fill(null).map((_, i) => {
@@ -58,8 +62,7 @@ export class SingleElimination {
             if (match.teams.length < 2) {
                 const winner = match.teams[0];
                 const loser = match.teams[1];
-                match.meta_data["winner"] = winner;
-                match.meta_data["loser"] = loser;
+                match.meta_data = { "winner": winner, "loser": loser };
                 match.next[0].teams.push(winner);
                 if (match.next[1] !== undefined) {
                     match.next[1].teams.push(loser);
@@ -71,38 +74,91 @@ export class SingleElimination {
         });
 
         this.ready = this.ready.slice(completed, this.ready.length);
+
+        this.tournament_events.on("ready", (match) => {
+            this.ready.push(match);
+            //TODO: have play event be emitted periodically
+            this.tournament_events.emit("play");
+        });
+
+        this.tournament_events.on("done", () => {
+            if (Math.floor(Math.random() * 3) == 0) {
+                this.playing = this.playing.filter((match) => {
+                    return match.meta_data === null;
+                });
+            }
+        });
+
+        this.tournament_events.on("finished?", () => {
+            if (this.winners.root.meta_data !== null
+                && this.bronze_final.root.meta_data !== null) {
+                this.playing = [];
+                this.ready = [];
+                this.tournament_events.emit("on_finished");
+            }
+        });
     }
 
     play(callback) {
-        this.playing = this.ready.map((match) => {
-            let winner, loser;
-            if (Math.floor(Math.random() * 2) == 0) {
-                winner = match.teams[0];
-                loser = match.teams[1];
-            }
-            else {
-                winner = match.teams[1];
-                loser = match.teams[0];
-            }
+        if (this.tournament_events.listeners("play").length !== 0) {
+            console.log("Play event already registered. Remove the event before calling play.");
+            return;
+        }
 
-            match.meta_data["winner"] = winner;
-            match.meta_data["loser"] = loser;
-
-            if (match.next !== null) {
-                match.next[0].teams.push(winner);
-                if (match.next[1] !== undefined) {
-                    match.next[1].teams.push(loser);
-                }
-                match.next.map((next_match) => {
-                    if (next_match.teams.length > 1) {
-                        this.queued.push(next_match);
+        this.tournament_events.on("play", () => {
+            this.playing.concat(this.ready.map((match) => {
+                return [match.teams, new Promise((res, rej) => {
+                    const result = callback(match.teams[0], match.teams[1]);
+                    if (result.error === undefined) {
+                        match.meta_data = result;
+                        res(match);
                     }
-                });
-            }
-
-            return match;
+                    else {
+                        rej(result.error);
+                    }
+                }).then((match: any) => {
+                    if (match.next !== null) {
+                        match.next[0].teams.push(match.meta_data.winner);
+                        if (match.next[1] !== undefined) {
+                            match.next[1].teams.push(match.meta_data.loser);
+                        }
+                        match.next.forEach((next_match) => {
+                            if (next_match.teams.length > 1) {
+                                this.tournament_events.emit("ready", next_match);
+                            }
+                        });
+                    }
+                    else { // root of bracket, check if the tournament is finished
+                        this.tournament_events.emit("finished?");
+                    }
+                    this.tournament_events.emit("done");
+                }).catch((err) => {
+                    //TODO: Implement error handling/recovery
+                    console.log(err, "should emit error event in order to notify "
+                        + "that the tournament has an issue");
+                })];
+            }));
+            this.ready = [];
         });
-        this.ready = this.queued;
-        this.queued = [];
+        this.tournament_events.emit("play");
+    }
+
+    pause() {
+        //TODO: Implement pausing of tournaments
+        console.log("rip"); //much professional
+    }
+
+    resume() {
+        //TODO: Implement resuming of tournaments
+        console.log("rip"); //much professional
+    }
+
+    stop() {
+        //TODO: Throw error after stopping tournament
+        this.tournament_events.removeAllListeners();
+    }
+
+    once(event, callback) {
+        this.tournament_events.once(event, callback);
     }
 }
