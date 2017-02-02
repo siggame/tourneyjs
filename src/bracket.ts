@@ -12,8 +12,8 @@
  *
  *Since the majority of the time N will not be a power
  *of two it will be necessary for some competitors to
- *get a first round by. The number of competitors to get
- *a by will be the size of the graph minus N. 
+ *get a first round bye. The number of competitors to get
+ *a bye will be the size of the graph minus N. 
  *
  *Things the bracket MUST support:
  *
