@@ -1,15 +1,17 @@
-import { Bracket } from "./bracket";
-import { permute } from "./permute";
+import { Bracket, Match } from "./bracket";
+import { permute } from "./utilities";
 import { EventEmitter } from "events";
 
-//TODO: Have a better method for preventing play after stopping
+type LiveMatch = [number, any[], Promise<Match>]
 
 export class SingleElimination {
-    public playing: any[];
-    public ready: any[];
-    public results: any[];
+    playing: LiveMatch[];
+    ready: Match[];
+    results: Match[];
+
     private bronze_final: Bracket;
-    private play_event: Function;
+    private play_handler: Function;
+    private play_timer: NodeJS.Timer;
     private tournament_events: EventEmitter;
     private winners: Bracket;
 
@@ -48,7 +50,7 @@ export class SingleElimination {
             let position = i ^ (i >> 1);
             let match: any = this.winners.root;
 
-            // find match for team
+            // follow gray code binary digits into position
             while (match.deps !== null) {
                 match = match.deps[position & 1];
                 position >>= 1;
@@ -68,7 +70,7 @@ export class SingleElimination {
 
         Array(this.ready.length).fill(null).map((_, i) => {
             const match = this.ready[i];
-            if (match.teams.length < 2) {
+            if (match.teams.length < 2) { // only one team, apply bye
                 const winner = match.teams[0];
                 const loser = match.teams[1];
                 match.meta_data = { "winner": winner, "loser": loser };
@@ -86,30 +88,53 @@ export class SingleElimination {
 
         this.tournament_events.on("ready", (match) => {
             this.ready.push(match);
-            //TODO: have play event be emitted periodically
-            this.tournament_events.emit("play");
-        }).on("done", () => {
-            setImmediate(() => {
+            this.play_timer = setImmediate(_ => this.tournament_events.emit("play"));
+        }).on("done", _ => {
+            setImmediate(_ => {
                 if (Math.floor(Math.random() * 3) == 0) {
-                    this.playing = this.playing.filter((match) => {
-                        return match.meta_data === null;
+                    this.playing = this.playing.filter((live_match) => {
+                        return live_match[2].then(match => {
+                            return match.meta_data === null;
+                        })
                     });
                 }
             });
-        }).on("finished?", () => {
-            setImmediate(() => {
-                const is_finished = this.results.reduce((res, match) => {
-                    return res && match.meta_data !== null;
-                }, true);
+        }).on("finished?", _ => {
+            setImmediate((is_finished) => {
                 if (is_finished) {
                     this.playing = [];
                     this.ready = [];
                     this.tournament_events.emit("on_finished");
                 }
-            });
-        }).on("error", () => {
-            console.log("A spooky error.");
+            }, this.results.reduce((accum, match) => {
+                return accum && match.meta_data !== null;
+            }, true));
+        }).on("error", (err) => {
+            this.pause();
+            console.error(err);
         });
+    }
+
+    private make_live(match, fight) {
+        return new Promise((res, rej) => {
+            const result = fight(match);
+            if (result.error === undefined) {
+                match.meta_data = result;
+                res(match);
+            }
+            else {
+                rej({ match: match, error: result.error });
+            }
+        })
+    }
+
+    enqueue(id: number) {
+        const match = this.winners.matches[id];
+        if (this.ready.indexOf(match) < 0) {
+            this.ready.push(match);
+            return true;
+        }
+        return false;
     }
 
     play(fight, success, error) {
@@ -121,49 +146,37 @@ export class SingleElimination {
             throw new Error("Tournament has been stopped.");
         }
 
-        // TODO: refactor this so it isn't GROSS
-        this.play_event = () => {
-            this.playing.concat(this.ready.map((match) => {
-                return [match.teams, new Promise((res, rej) => {
-                    const result = fight(match.teams[0], match.teams[1]);
-                    if (result.error === undefined) {
-                        match.meta_data = result;
-                        res(match);
-                    }
-                    else {
-                        rej({ match: match, error: result.error });
-                    }
-                }).then((match: any) => {
-                    if (match.next !== null) {
-                        match.next[0].teams.push(match.meta_data.winner);
-                        if (match.next[1] !== undefined) {
-                            match.next[1].teams.push(match.meta_data.loser);
-                        }
-                        match.next.forEach((next_match) => {
-                            if (next_match.teams.length > 1) {
+        this.play_handler = _ => {
+            const live_matches = this.ready.map((match): LiveMatch => {
+                return [
+                    match.id,
+                    match.teams,
+                    this.make_live(match, fight)
+                        .then((match: Match) => {
+                            match.notify_next((next_match) => {
                                 this.tournament_events.emit("ready", next_match);
-                            }
-                        });
-                    }
-                    else { // root of bracket, check if the tournament is finished
-                        this.tournament_events.emit("finished?");
-                    }
-                    success(match);
-                    this.tournament_events.emit("done");
-                }).catch((err) => {
-                    //TODO: Implement error handling/recovery
-                    error(err.match, err.error);
-                })];
-            }));
+                            }, _ => this.tournament_events.emit("finished?"));
+                            success(match);
+                            this.tournament_events.emit("done");
+                            return match;
+                        }).catch((err) => {
+                            error(match, err);
+                            this.tournament_events.emit("error", err);
+                        })
+                ]
+            });
+
+            this.playing.concat(live_matches);
             this.ready = [];
         };
 
-        this.tournament_events.on("play", this.play_event);
-        this.tournament_events.emit("play");
+        this.tournament_events.on("play", this.play_handler);
+        this.play_timer = setImmediate(_ => this.tournament_events.emit("play"));
     }
 
     pause() {
-        this.tournament_events.removeListener("play", this.play_event);
+        clearImmediate(this.play_timer);
+        this.tournament_events.removeListener("play", this.play_handler);
     }
 
     resume() {
@@ -175,18 +188,12 @@ export class SingleElimination {
             throw new Error("Tournament has been stopped.");
         }
 
-        this.tournament_events.on("play", this.play_event);
-        this.tournament_events.emit("play");
-    }
-
-    status() {
-        //TODO: Implement status reporting of tournaments
-        // perhaps allow something to register to an event
-        // and be updated when changes are made
-        console.log("rip"); //much professional
+        this.tournament_events.on("play", this.play_handler);
+        this.play_timer = setImmediate(_ => this.tournament_events.emit("play"));
     }
 
     stop() {
+        clearImmediate(this.play_timer);
         this.tournament_events.removeAllListeners();
     }
 

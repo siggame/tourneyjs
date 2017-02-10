@@ -1,4 +1,4 @@
-// Bracket API
+// Bracket Type
 
 /*
  *Bracket internally is just a graph structure (DAG)
@@ -6,9 +6,10 @@
  *A match in a bracket has the two matches it depends on
  *and then the match which depends on it. To construct
  *the bracket, simply take the number of competitors 
- *provided to the bracket (N) and find the closest
- *power of two greater than N. This will fit all of the
- *necessary matches into the dependency graph.
+ *provided to the bracket (N), divide by two, then find 
+ *the closest power of two greater than floor(N/2). This 
+ *will fit all of the necessary matches into the 
+ *dependency graph.
  *
  *Since the majority of the time N will not be a power
  *of two it will be necessary for some competitors to
@@ -29,24 +30,45 @@
  *
  */
 
-class Match {
-    public teams: any[];
-    public next: Match[];
-    public deps: Match[];
-    public meta_data: {};
+export class Match {
+    id: number;
+    teams: any[];
+    next: Match[];
+    deps: Match[];
+    meta_data: {};
 
-    constructor() {
+    constructor(id: number) {
+        this.id = id;
         this.teams = [];
         this.next = null;
         this.deps = null;
         this.meta_data = null;
     }
+
+    public notify_next(ready, finished) {
+        if (this.next !== null) {
+            const winner = this.meta_data["winner"];
+            this.next[0].teams.push(winner);
+            if (this.next[1] !== undefined) {
+                const loser = this.meta_data["loser"];
+                this.next[1].teams.push(loser);
+            }
+            this.next.forEach((next_match) => {
+                if (next_match.teams.length > 1) {
+                    ready(next_match);
+                }
+            });
+        }
+        else {
+            finished();
+        }
+    }
 }
 
 export class Bracket {
-    public root: Match;
-    public dep: Bracket;
-    public matches: Match[];
+    root: Match;
+    dep: Bracket;
+    matches: Match[];
 
     constructor(num_teams: number) {
         let leaves = Math.ceil(Math.log2(num_teams / 2));
@@ -55,8 +77,8 @@ export class Bracket {
             leaves += 1;
         }
 
-        this.matches = Array.apply(null, { length: 2 * leaves - 1 }).map(_ => {
-            return new Match();
+        this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => {
+            return new Match(i);
         });
 
         this.matches.forEach((match, i) => {
@@ -68,11 +90,6 @@ export class Bracket {
         });
 
         this.root = this.matches[0];
-        this.root.next = null;
         this.dep = null;
-    }
-
-    public dep_list(id: number): Match[] {
-        return this.matches[id].deps;
     }
 }
