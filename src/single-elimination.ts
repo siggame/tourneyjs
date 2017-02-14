@@ -117,14 +117,13 @@ export class SingleElimination {
 
     private make_live(match, fight) {
         return new Promise((res, rej) => {
-            const result = fight(match);
-            if (result.error === undefined) {
-                match.meta_data = result;
-                res(match);
-            }
-            else {
-                rej({ match: match, error: result.error });
-            }
+            fight(match)
+                .then(result => {
+                    match.meta_data = result;
+                    return match;
+                })
+                .then(res)
+                .catch(rej)
         })
     }
 

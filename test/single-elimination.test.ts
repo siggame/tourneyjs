@@ -43,14 +43,14 @@ describe("Single Elimination", () => {
             done();
         });
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
     });
 
     it("should be playable", (done) => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
         should(t.playing).not.be.empty;
         done();
@@ -63,14 +63,14 @@ describe("Single Elimination", () => {
             done();
         });
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
     });
 
     it("should be pausable", (done) => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
         t.pause();
         setImmediate(() => {
@@ -86,7 +86,7 @@ describe("Single Elimination", () => {
             done();
         });
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
         t.pause();
         setImmediate(() => {
@@ -97,7 +97,7 @@ describe("Single Elimination", () => {
     it("should be stoppable", (done) => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
         t.stop();
         const bad = () => { t.resume() };
@@ -108,12 +108,12 @@ describe("Single Elimination", () => {
     it("should not be playable after stopping", (done) => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , _ => { }, _ => { });
         t.stop();
         const bad = () => {
             t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-                ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+                Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
                 , _ => { }, _ => { });
         };
         bad.should.throw("Tournament has been stopped.");
@@ -123,7 +123,7 @@ describe("Single Elimination", () => {
     it("should pause tournament on error", (done) => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , match => {
                 if (match.id === 20) throw new Error("borked")
             }, (id, err) => {
@@ -135,13 +135,13 @@ describe("Single Elimination", () => {
         const t = new tourney.SingleElimination(Array(10000).fill(null), false, false);
         t.once("on_finished", _ => done());
         t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-            ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+            Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
             , match => {
                 if (match.id === 100) throw new Error("borked")
             }, (match, err) => {
                 t.ready.push(match)
                 t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-                    ({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
+                    Promise.resolve({ "winner": match.teams[winner], "loser": match.teams[winner ^ 1] })
                     , match => {
                     }, (match, err) => {
                     });
