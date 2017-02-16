@@ -71,18 +71,14 @@ export class Bracket {
     matches: Match[];
 
     constructor(num_teams: number) {
-        let leaves = Math.ceil(Math.log2(num_teams / 2));
-
-        if (leaves !== Math.log2(num_teams / 2) || leaves == 0) {
-            leaves += 1;
-        }
+        let leaves = 2 ** Math.ceil(Math.log2(num_teams / 2));
 
         this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => {
             return new Match(i);
         });
 
         this.matches.forEach((match, i) => {
-            if ((2 * i + 1) < this.matches.length) {
+            if ((2 * i + 2) < this.matches.length) {
                 match.deps = [this.matches[2 * i + 1], this.matches[2 * i + 2]];
             }
             const parent = Math.floor((i - 1) / 2);

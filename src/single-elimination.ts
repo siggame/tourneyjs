@@ -48,7 +48,7 @@ export class SingleElimination {
         (randomize ? permute(teams) : teams).forEach((team, i) => {
             // convert index to gray code
             let position = i ^ (i >> 1);
-            let match: any = this.winners.root;
+            let match: Match = this.winners.root;
 
             // follow gray code binary digits into position
             while (match.deps !== null) {
@@ -111,19 +111,19 @@ export class SingleElimination {
             }, true));
         }).on("error", (err) => {
             this.pause();
-            console.error(err);
+            console.error(err.stack);
         });
     }
 
     private make_live(match, fight) {
-        return new Promise((res, rej) => {
+        return new Promise((resolve, reject) => {
             fight(match)
                 .then(result => {
                     match.meta_data = result;
                     return match;
                 })
-                .then(res)
-                .catch(rej)
+                .then(resolve)
+                .catch(reject)
         })
     }
 
@@ -152,6 +152,9 @@ export class SingleElimination {
                     match.teams,
                     this.make_live(match, fight)
                         .then((match: Match) => {
+                            if (!("winner" in match.meta_data && "loser" in match.meta_data)) {
+                                throw new Error("Missing meta data.")
+                            }
                             match.notify_next((next_match) => {
                                 this.tournament_events.emit("ready", next_match);
                             }, _ => this.tournament_events.emit("finished?"));
@@ -159,8 +162,8 @@ export class SingleElimination {
                             this.tournament_events.emit("done");
                             return match;
                         }).catch((err) => {
-                            error(match, err);
                             this.tournament_events.emit("error", err);
+                            error(match, err);
                         })
                 ]
             });
