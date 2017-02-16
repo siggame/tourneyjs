@@ -1,5 +1,5 @@
-import { swiss } from "./swiss";
-import { Bracket, Match } from "./bracket";
-import { SingleElimination } from "./single-elimination";
+import { Bracket } from "./bracket";
+import { Match } from "./match";
+import { LiveMatch, SingleElimination } from "./single-elimination";
 
-export { swiss, Bracket, Match, SingleElimination };
+export { Bracket, LiveMatch, Match, SingleElimination };

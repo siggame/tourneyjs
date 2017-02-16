@@ -1,8 +1,9 @@
-import { Bracket, Match } from "./bracket";
+import { Bracket } from "./bracket";
+import { Match } from "./match"
 import { permute } from "./utilities";
 import { EventEmitter } from "events";
 
-type LiveMatch = [number, any[], Promise<Match>]
+export type LiveMatch = [number, any[], Promise<Match>]
 
 export class SingleElimination {
     playing: LiveMatch[];
