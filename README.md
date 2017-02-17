@@ -8,13 +8,13 @@ Tournament algorithms
 
 ```javascript
 // create single elimination tournament without bronze finals
-const single_elim = new tourney.SingleElimination([ ... teams ... ]);
+const single_elim = new SingleElimination([ ... teams ... ]);
 
 // or with bronze finals
-// const single_elim = new tourney.SingleElimination([ ... teams ... ], true);
+// const single_elim = new SingleElimination([ ... teams ... ], true);
 
 // or with randomized seeding
-// const single_elim = new tourney.SingleElimination([ ... teams ... ], false, true);
+// const single_elim = new SingleElimination([ ... teams ... ], false, true);
 
 // add on_finished event listener
 single_elim.once('on_finished', some_callback);
@@ -24,7 +24,7 @@ single_elim.once('error', some_error_handler);
 
 /* Allow for asynchronous progress of the tournament.
  *
- * fight_cb(match) : {} 
+ * fight_cb(match) : Promise<{}>
  *
  * needs to return the winner and loser of
  * a match (ie { winner: "bob", loser: "tom"})
@@ -49,4 +49,3 @@ single_elim.stop();
 single_elim.resume();
 // Error thrown
 ```
-

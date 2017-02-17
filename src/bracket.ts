@@ -33,26 +33,26 @@
 import { Match } from "./match"
 
 export class Bracket {
-    root: Match;
-    dep: Bracket;
-    matches: Match[];
+  root: Match;
+  dep: Bracket;
+  matches: Match[];
 
-    constructor(num_teams: number) {
-        let leaves = 2 ** Math.ceil(Math.log2(num_teams / 2));
+  constructor(num_teams: number) {
+    let leaves = 2 ** Math.ceil(Math.log2(num_teams / 2));
 
-        this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => {
-            return new Match(i);
-        });
+    this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => {
+      return new Match(i);
+    });
 
-        this.matches.forEach((match, i) => {
-            if ((2 * i + 2) < this.matches.length) {
-                match.deps = [this.matches[2 * i + 1], this.matches[2 * i + 2]];
-            }
-            const parent = Math.floor((i - 1) / 2);
-            match.next = parent >= 0 ? [this.matches[parent]] : null;
-        });
+    this.matches.forEach((match, i) => {
+      if ((2 * i + 2) < this.matches.length) {
+        match.deps = [this.matches[2 * i + 1], this.matches[2 * i + 2]];
+      }
+      const parent = Math.floor((i - 1) / 2);
+      match.next = parent >= 0 ? [this.matches[parent]] : null;
+    });
 
-        this.root = this.matches[0];
-        this.dep = null;
-    }
+    this.root = this.matches[0];
+    this.dep = null;
+  }
 }
