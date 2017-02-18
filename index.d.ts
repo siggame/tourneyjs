@@ -2,9 +2,8 @@
 // Project: [Tourneyjs]
 // Definitions by: [Quincy Conduff] <[https://github.com/user404d]>
 
-/*~ You can declare types that are available via importing the module */
-
 export type LiveMatch = [number, any[], Promise<Match>]
+export type Settings = { with_bronze_final: boolean, randomize: boolean }
 
 export interface Bracket {
   root: Match
