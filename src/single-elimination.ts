@@ -1,7 +1,7 @@
 import { Bracket } from "./bracket";
 import { Duel } from "./duel";
-import { IMatch, Match } from "./match";
-import { ITournamentEventHandler, ITournamentPlayHandler, Tournament } from "./tournament";
+import { IMatch } from "./match";
+import { Tournament } from "./tournament";
 import { permute } from "./utilities";
 
 export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: boolean; }
@@ -23,8 +23,16 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
     this.dep = null;
   }
 
+  addLowerBracket() {
+    this.dep = new SingleEliminationBracket<T>(2);
+    this.dep.root = this.root;
+    this.root.deps.forEach((match) => {
+      match.next.push(this.dep.root);
+    });
+  }
+
   prepareMatches(teams: T[]) {
-    const readyMatches: Duel<T>[] = [];
+    const maybeReadyMatches: Duel<T>[] = [];
     teams.forEach((team, i) => {
       // convert index to gray code
       let position = i ^ (i >> 1);
@@ -39,39 +47,39 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
       // add team to match found
       match.teams.push(team);
 
-      if (readyMatches.indexOf(match) < 0) {
-        readyMatches.push(match);
+      if (maybeReadyMatches.indexOf(match) < 0) {
+        maybeReadyMatches.push(match);
       }
     });
 
-    return readyMatches.reduce((acc: Duel<T>[], match) => {
+    return maybeReadyMatches.reduce((readyMatches: Duel<T>[], match) => {
       if (match.teams.length < 2) {
         const [winner, loser] = match.teams;
         match.metaData = { winner, losers: [loser] };
         match.update(() => { }, () => { });
         const [upper, lower] = match.next;
         if (upper && upper.teams.length === 2) {
-          acc.push(upper);
+          readyMatches.push(upper);
         }
         if (lower && lower.teams.length === 2) {
-          acc.push(lower);
+          readyMatches.push(lower);
         }
       } else {
-        acc.push(match);
+        readyMatches.push(match);
       }
-      return acc;
+      return readyMatches;
     }, []);
   }
 }
 
 export class SingleEliminationTournament<T> extends Tournament<T> {
 
-  public teams: T[];
   public playing: Duel<T>[];
   public queued: Duel<T>[];
-  private upperBracket: SingleEliminationBracket<T>;
+  public teams: T[];
   private playTimer: NodeJS.Timer;
   private playHandler: () => Promise<void>;
+  private upperBracket: SingleEliminationBracket<T>;
 
   constructor(
     teams: T[],
@@ -92,7 +100,6 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
       if (this.status === "stopped") {
         throw new Error("Tournament has been stopped.");
       }
-
       this.playHandler = async () => {
         this.queued.forEach(async (match: Duel<T>) => {
           try {
@@ -108,6 +115,7 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
             error(match, e);
           }
         });
+
         this.playing.concat(this.queued);
         this.queued = [];
       };
@@ -116,21 +124,15 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
       this._play();
     });
 
-    this.when = (event, cb) => this.once(event, cb);
-    this.queued = [];
     this.playing = [];
+    this.queued = [];
+    this.teams = randomize ? permute(teams) : teams;
     this.upperBracket = new SingleEliminationBracket<T>(teams.length);
 
-    if (bronzeFinal) {
-      this.upperBracket.dep = new SingleEliminationBracket<T>(2);
-      this.upperBracket.dep.root.deps = this.upperBracket.root.deps;
-      this.upperBracket.root.deps.forEach((match) => {
-        match.next.push(this.upperBracket.dep.root);
-      });
-    }
+    if (bronzeFinal) { this.upperBracket.addLowerBracket(); }
 
     // seed teams
-    this.queued = this.upperBracket.prepareMatches(randomize ? permute(teams) : teams);
+    this.queued = this.upperBracket.prepareMatches(this.teams);
 
     this.on("enqueue", (match: Duel<T>) => this.queued.push(match));
     this.on("finished?", this._checkFinished);
@@ -146,7 +148,7 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
       } else {
         this.emit("finished", [upper]);
       }
-      this.stop();
+      this.pause();
     }
   }
 

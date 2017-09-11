@@ -1,10 +1,9 @@
 import { EventEmitter } from "events";
 
-import { Bracket } from "./bracket";
 import { IMatchResult, Match } from "./match";
 
 type TournamentStatus = "init" | "playing" | "paused" | "stopped";
-type TournamentEvents = "ready" | "finished";
+type TournamentEvents = "error" | "finished" | "ready";
 
 export interface ITournamentPlayHandler<T> {
     (
@@ -40,5 +39,5 @@ export abstract class Tournament<T> extends EventEmitter implements ITournament<
     pause(): void { }
     resume(): void { }
     stop(): void { }
-    when: ITournamentEventHandler<T> = () => this;
+    when: ITournamentEventHandler<T> = (event, cb) => this.once(event, cb);
 }

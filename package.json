@@ -8,6 +8,7 @@
     "clean": "rm index.js && npm run clean:src && npm run clean:test",
     "clean:src": "rimraf -rf src/*.js src/**/*.js",
     "clean:test": "rimraf -rf test/*.js test/**/*.js",
+    "lint": "tslint --format verbose --project ./tsconfig.json",
     "pretest": "npm run build",
     "setup": "npm install",
     "test": "mocha --colors test/"

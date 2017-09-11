@@ -1,49 +1,54 @@
 import * as should from "should";
-import { Duel, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../";
+import { Duel, IMatchResult, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../";
 
 export default function () {
   describe("Single Elimination Tournament", function () {
     this.timeout(10000);
-    const bronze_no_rand: ises = { bronzeFinal: true, randomize: false };
-    const no_bronze_rand: ises = { bronzeFinal: false, randomize: true };
-    const bronze_rand: ises = { bronzeFinal: true, randomize: true };
+    const bronzeNoRand: ises = { bronzeFinal: true, randomize: false };
+    const noBronzeRand: ises = { bronzeFinal: false, randomize: true };
+    const bronzeRand: ises = { bronzeFinal: true, randomize: true };
 
     it("should be constructible", (done) => {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"]);
+      should(t).not.be.null;
       done();
     });
 
     it("should have ready matches with two players only", (done) => {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"]);
-      const two_players_only = t.queued.length === 2;
-      two_players_only.should.be.true;
+      const twoPlayersOnly = t.queued.length === 2;
+      twoPlayersOnly.should.be.true;
       done();
     });
 
     it("should have enough ready matches", (done) => {
-      const num_teams = Math.floor(Math.random() * 100 + 17);
-      const t = new single(Array(num_teams).fill(null));
-      const enough_matches = t.queued.length === Math.floor(num_teams / 2);
-      enough_matches.should.be.true;
+      const numTeams = Math.floor(Math.random() * 100 + 17);
+      const t = new single(Array(numTeams).fill(null));
+      const enoughMatches = t.queued.length === Math.floor(numTeams / 2);
+      enoughMatches.should.be.true;
       done();
     });
 
-    // it("should seed teams correctly without randomization", (done) => {
-    //   const teams = [1, 2, 3, 4, 5];
-    //   const t = new single(teams);
-    //   should(t.ready[0].teams).deepEqual([4, 5]);
-    //   should(t.ready[1].teams).deepEqual([2, 3]);
-    //   done();
-    // });
-
-    // it("should allow bronze final", (done) => {
-    //   const t = new single(["abc", "def", "ghi", "lmn", "opq"], bronze_no_rand);
-    //   should(t.results.length).equal(2);
-    //   done();
-    // });
+    it("should allow bronze final", (done) => {
+      const t = new single(["abc", "def", "ghi", "lmn", "opq"], bronzeNoRand);
+      t.when("finished", ([upper, lower]: IMatchResult<string>[]) => {
+        should(upper.winner).not.be.null;
+        should(upper.losers).be.lengthOf(1);
+        should(lower.winner).not.be.null;
+        should(lower.losers).be.lengthOf(1);
+        done();
+      });
+      t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
+        Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] }),
+        () => { },
+        () => { },
+      );
+    });
 
     it("should allow randomization", (done) => {
-      const t = new single(["abc", "def", "ghi", "lmn", "opq"], no_bronze_rand);
+      const teams = ["abc", "def", "ghi", "lmn", "opq"];
+      const t = new single(teams, noBronzeRand);
+      should(t.teams).not.be.deepEqual(teams);
       done();
     });
 
@@ -60,7 +65,7 @@ export default function () {
     });
 
     it("should not allow bronze final with two teams", (done) => {
-      const bad = () => { new single(["ahhh", "woo"], bronze_no_rand); };
+      const bad = () => { new single(["ahhh", "woo"], bronzeNoRand); };
       bad.should.throw("Not enough teams to have bronze final.");
       done();
     });
@@ -88,7 +93,7 @@ export default function () {
     });
 
     it("should finish tournament", (done) => {
-      const t = new single(Array(1000).fill(null), bronze_rand);
+      const t = new single(Array(1000).fill(null), bronzeRand);
       t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
         done();
@@ -171,9 +176,12 @@ export default function () {
         , (match) => {
           if (match.id === 20) throw new Error("borked");
         }, (match, err) => {
-          console.log(match);
           done();
         });
+      t.when("finished", () => {
+        should(1).not.equal(1, "Tournament was able to finish despite being paused.");
+        done();
+      });
     });
 
     it("should recover tournament on error", (done) => {
