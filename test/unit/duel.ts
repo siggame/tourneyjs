@@ -1,3 +1,5 @@
+import * as should from "should";
+
 import { Duel } from "../..";
 
 export default function () {
