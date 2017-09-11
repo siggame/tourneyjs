@@ -6,7 +6,7 @@ Tournament Algorithms
 [![Docker Pulls](https://img.shields.io/docker/pulls/siggame/tourneyjs.svg?style=flat-square)](https://hub.docker.com/r/siggame/tourneyjs/)
 [![GitHub Tag](https://img.shields.io/github/tag/siggame/tourneyjs.svg?style=flat-square)](https://github.com/siggame/tourneyjs/tags)
 [![Dependencies](https://img.shields.io/david/siggame/tourneyjs.svg)](https://github.com/siggame/tourneyjs)
-[![NPM Version](https://img.shields.io/npm/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
+[![NPM Version](https://img.shields.io/npm/v/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
 [![NPM Total Downloads](https://img.shields.io/npm/dt/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
 
 ## Table Of Contents
@@ -106,4 +106,4 @@ View our [LICENSE.md](https://github.com/siggame/colisee/blob/master/LICENSE.md)
 
 ## Contributing
 
-View our [CONTRIBUTING.md](https://github.com/siggame/colisee/blob/master/CONTRIBUTING.md)# tourneyjs
+View our [CONTRIBUTING.md](https://github.com/siggame/colisee/blob/master/CONTRIBUTING.md)
