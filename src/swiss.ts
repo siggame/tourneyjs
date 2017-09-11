@@ -1,7 +1,7 @@
-export class swiss {
+export class Swiss {
   public name: string;
   constructor() {
-    this.name = 'swiss';
+    this.name = "swiss";
   }
 
   foo(): string {

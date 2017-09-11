@@ -6,11 +6,11 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm index.js && npm run clean:src && npm run clean:test",
-    "clean:src": "find src -name *.js -exec rm {} +",
-    "clean:test": "find test -name *.js -exec rm {} +",
+    "clean:src": "rimraf -rf src/**/*.js",
+    "clean:test": "rimraf -rf test/**/*.js",
     "pretest": "npm run build",
     "setup": "npm install",
-    "test": "mocha test/"
+    "test": "mocha --colors test/"
   },
   "repository": {
     "type": "git",
@@ -31,13 +31,15 @@
   },
   "homepage": "https://github.com/siggame/tourneyjs#readme",
   "devDependencies": {
+    "@siggame/colisee-tslint": "^1.0.3",
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.0",
     "@types/should": "^8.1.30",
-    "should": "^11.1.2",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "rimraf": "^2.6.1",
+    "should": "^11.1.2"
   },
   "dependencies": {
-    "typescript": "^2.1.5"
+    "typescript": "^2.5.2"
   }
 }
