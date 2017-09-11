@@ -1,6 +1,6 @@
 {
   "name": "@siggame/tourneyjs",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Tournament Algorithms",
   "main": "src/index.js",
   "scripts": {
