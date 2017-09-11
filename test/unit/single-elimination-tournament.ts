@@ -1,5 +1,5 @@
 import * as should from "should";
-import { ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../";
+import { Duel, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../";
 
 export default function () {
   describe("Single Elimination Tournament", function () {
@@ -15,7 +15,7 @@ export default function () {
 
     it("should have ready matches with two players only", (done) => {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"]);
-      const two_players_only = t.listeners("begin").length === 2;
+      const two_players_only = t.queued.length === 2;
       two_players_only.should.be.true;
       done();
     });
@@ -23,7 +23,7 @@ export default function () {
     it("should have enough ready matches", (done) => {
       const num_teams = Math.floor(Math.random() * 100 + 17);
       const t = new single(Array(num_teams).fill(null));
-      const enough_matches = t.listeners("begin").length === Math.floor(num_teams / 2);
+      const enough_matches = t.queued.length === Math.floor(num_teams / 2);
       enough_matches.should.be.true;
       done();
     });
@@ -67,7 +67,7 @@ export default function () {
 
     it("should allow tournaments with 2 teams", (done) => {
       const t = new single(Array(2).fill(null));
-      t.once("finished", ([upper, lower]) => {
+      t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
         done();
       });
@@ -89,7 +89,7 @@ export default function () {
 
     it("should finish tournament", (done) => {
       const t = new single(Array(1000).fill(null), bronze_rand);
-      t.once("finished", ([upper, lower]) => {
+      t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
         done();
       });
@@ -98,21 +98,21 @@ export default function () {
         , _ => { }, _ => { });
     });
 
-    // it("should be pausable", (done) => {
-    //   const t = new single(Array(1000).fill(null));
-    //   t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-    //     Promise.resolve({ winner: match.teams[winner], loser: match.teams[winner ^ 1] })
-    //     , _ => { }, _ => { });
-    //   t.pause();
-    //   setImmediate(() => {
-    //     should(t.ready).not.be.empty();
-    //     done();
-    //   });
-    // });
+    it("should be pausable", (done) => {
+      const t = new single(Array(1000).fill(null));
+      t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
+        Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
+        , _ => { }, _ => { });
+      t.pause();
+      setImmediate(() => {
+        should(t.queued).not.be.empty();
+        done();
+      });
+    });
 
     it("should be resumable", (done) => {
       const t = new single(Array(1000).fill(null));
-      t.once("finished", ([upper, lower]) => {
+      t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
         done();
       });
@@ -168,7 +168,7 @@ export default function () {
       const t = new single<null>(Array(1000).fill(null));
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
         Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
-        , match => {
+        , (match) => {
           if (match.id === 20) throw new Error("borked");
         }, (match, err) => {
           console.log(match);
@@ -176,31 +176,30 @@ export default function () {
         });
     });
 
-    // it("should recover tournament on error", (done) => {
-    //   const t = new single(Array(1000).fill(null));
-    //   t.once("on_finished", _ => done());
-    //   t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-    //     Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
-    //     , match => {
-    //       if (match.id === 100) throw new Error("borked");
-    //     }, (match, err) => {
-    //       t.ready.push(match);
-    //       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
-    //         Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
-    //         , match => {
-    //         }, (match, err) => {
-    //         });
-    //     });
-    // });
-
-    it("should finish tournament with more than 1/2 teams getting a bye", (done) => {
-      const t = new single(Array(1025).fill(null));
-      t.once("finished", () => done());
+    it("should recover tournament on error", (done) => {
+      const t = new single(Array(1000).fill(null));
+      t.when("finished", () => done());
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
         Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
         , match => {
-        }, (match, err) => {
+          if (match.id === 100) throw new Error("borked");
+        }, (match: Duel<any>, err) => {
+          t.queued.push(match);
+          t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
+            Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] }),
+            (match) => { },
+            (match, err) => { });
         });
+    });
+
+    it("should finish tournament with more than 1/2 teams getting a bye", (done) => {
+      const t = new single(Array(1025).fill(null));
+      t.when("finished", () => done());
+      t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
+        Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] }),
+        (match) => { },
+        (match, err) => { },
+      );
     });
   });
 }

@@ -3,5 +3,5 @@
 // Definitions by: [Quincy Conduff] <[https://github.com/user404d]>
 
 export { IBracket } from "./src/bracket";
-export { IMatch } from "./src/match";
-export { ITournament } from "./src/tournament";
+export { IMatchResult, IMatchUpdateHandler, IMatch } from "./src/match";
+export { ITournamentPlayHandler, ITournament } from "./src/tournament";
