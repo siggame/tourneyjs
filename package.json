@@ -11,6 +11,7 @@
     "lint": "tslint --format verbose --project ./tsconfig.json",
     "pretest": "npm run build",
     "setup": "npm install",
+    "postsetup": "npm run build",
     "test": "mocha --colors test/"
   },
   "repository": {
