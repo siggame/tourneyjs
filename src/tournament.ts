@@ -2,8 +2,8 @@ import { EventEmitter } from "events";
 
 import { IMatchResult, Match } from "./match";
 
-type TournamentStatus = "init" | "playing" | "paused" | "stopped";
-type TournamentEvents = "error" | "finished" | "ready";
+export type TournamentStatus = "init" | "playing" | "paused" | "stopped";
+export type TournamentEvents = "error" | "finished" | "ready";
 
 export interface ITournamentPlayHandler<T> {
     (

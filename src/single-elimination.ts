@@ -9,26 +9,29 @@ export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: b
 export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
   constructor(numTeams: number) {
     super();
+
     const leaves = 2 ** Math.ceil(Math.log2(numTeams / 2));
     this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => new Duel<T>(i));
+
     this.matches.forEach((match, i) => {
       if ((2 * i + 2) < this.matches.length) {
         match.deps = [this.matches[2 * i + 1], this.matches[2 * i + 2]];
       }
       const parent = Math.floor((i - 1) / 2);
-      match.next = parent >= 0 ? [this.matches[parent]] : null;
+      if (parent >= 0) { match.next = [this.matches[parent]]; }
     });
 
     this.root = this.matches[0];
-    this.dep = null;
   }
 
   addLowerBracket() {
     this.dep = new SingleEliminationBracket<T>(2);
     this.dep.root = this.root;
-    this.root.deps.forEach((match) => {
-      match.next.push(this.dep.root);
-    });
+    if (this.root.deps) {
+      this.root.deps.forEach((match) => {
+        if (this.dep && match.next) { match.next.push(this.dep.root); }
+      });
+    }
   }
 
   prepareMatches(teams: T[]) {
@@ -53,7 +56,7 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
     });
 
     return maybeReadyMatches.reduce((readyMatches: Duel<T>[], match) => {
-      if (match.teams.length < 2) {
+      if (match.teams.length < 2 && match.next) {
         const [winner, loser] = match.teams;
         match.metaData = { winner, losers: [loser] };
         match.update(() => { }, () => { });

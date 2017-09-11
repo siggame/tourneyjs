@@ -2,17 +2,19 @@
   "name": "@siggame/tourneyjs",
   "version": "0.1.1",
   "description": "Tournament Algorithms",
-  "main": "src/index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:dist": "tsc -p tsconfig.dist.json",
     "clean": "npm run clean:src && npm run clean:test && npm run clean:misc",
-    "clean:misc": "rimraf -rf index.js node_modules/",
-    "clean:src": "rimraf -rf src/*.js src/**/*.js",
-    "clean:test": "rimraf -rf test/*.js test/**/*.js",
+    "clean:misc": "rimraf index.js lib/ node_modules/",
+    "clean:src": "rimraf src/*.js src/**/*.js",
+    "clean:test": "rimraf test/*.js test/**/*.js",
     "lint": "tslint --format verbose --project ./tsconfig.json",
     "pretest": "npm run build",
     "setup": "npm install",
-    "postsetup": "npm run build",
+    "postsetup": "npm run build:dist",
     "test": "mocha --colors test/"
   },
   "repository": {
@@ -36,13 +38,13 @@
   "devDependencies": {
     "@siggame/colisee-tslint": "^1.0.3",
     "@types/mocha": "^2.2.43",
-    "@types/node": "^8.0.28",
     "@types/should": "^11.2.0",
     "mocha": "^3.5.2",
     "rimraf": "^2.6.1",
     "should": "^11.2.1"
   },
   "dependencies": {
+    "@types/node": "^8.0.28",
     "typescript": "^2.5.2"
   }
 }

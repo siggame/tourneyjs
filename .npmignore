@@ -1,5 +1,16 @@
 .nvmrc
 .travis.yml
 .gitattributes
+.gitignore
 
+index.ts
+
+tsconfig.json
+tsconfig.dist.json
 tslint.json
+
+package-lock.json
+
+src/
+test/
+node_modules/

@@ -12,7 +12,7 @@ export class Duel<T> extends Match<T> implements IMatch<T> {
 
     public update: IMatchUpdateHandler<T> =
     (notify, finished) => {
-        if (this.next) {
+        if (this.next && this.metaData) {
             const [upper, lower] = this.next;
             const { winner, losers: [loser] } = this.metaData;
             let teamCount = upper.teams.push(winner);

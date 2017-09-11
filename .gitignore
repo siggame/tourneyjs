@@ -4,3 +4,5 @@ node_modules/
 # Compiled files
 index.js
 *.js
+
+*.d.ts
