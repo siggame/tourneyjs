@@ -1,13 +1,38 @@
-# tourneyjs
+# siggame/tourneyjs
 
-Tournament algorithms
+Tournament Algorithms
 
-[![Build Status](https://travis-ci.org/siggame/tourneyjs.svg?branch=master)](https://travis-ci.org/siggame/tourneyjs)
+[![Travis](https://img.shields.io/travis/siggame/tourneyjs.svg?style=flat-square)](https://travis-ci.org/siggame/tourneyjs)
+[![Docker Pulls](https://img.shields.io/docker/pulls/siggame/tourneyjs.svg?style=flat-square)](https://hub.docker.com/r/siggame/tourneyjs/)
+[![GitHub Tag](https://img.shields.io/github/tag/siggame/tourneyjs.svg?style=flat-square)](https://github.com/siggame/tourneyjs/tags)
+[![Dependencies](https://img.shields.io/david/siggame/tourneyjs.svg)](https://github.com/siggame/tourneyjs)
+[![NPM Version](https://img.shields.io/npm/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
+[![NPM Total Downloads](https://img.shields.io/npm/dt/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
 
-## Single Elimination
+## Table Of Contents
+
+- [Description](#description)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Contributors](#contributors)
+- [Change Log](#change-log)
+- [License](#license)
+- [Contributing](#contributing)
+
+## Description
+
+A long description of the project.
+
+## Getting Started
+
+How to get/install the service or library.
+
+## Usage
+
+### Single Elimination
 
 ```javascript
-import { SingleElimination } from "tourneyjs";
+import { SingleEliminationTournament } from "tourneyjs";
 
 // create single elimination tournament without bronze finals
 /**
@@ -15,7 +40,7 @@ import { SingleElimination } from "tourneyjs";
  * Settings : { with_bronze_final : boolean, randomize : boolean }
 */
 
-const single_elim = new SingleElimination([ ... teams ... ]);
+const single_elim = new SingleEliminationTournament([ ... teams ... ]);
 
 // or with bronze finals
 
@@ -40,10 +65,10 @@ const single_elim = new SingleElimination([ ... teams ... ]);
 */
 
 // add on_finished event listener
-single_elim.once('on_finished', some_callback);
+single_elim.when("finished", some_callback);
 
 // add error event listener
-single_elim.once('error', some_error_handler);
+single_elim.when("error", some_error_handler);
 
 /** 
  * Allow for asynchronous progress of the tournament.
@@ -74,3 +99,22 @@ single_elim.stop();
 single_elim.resume();
 // Error thrown
 ```
+
+## Contributors
+
+- [Russley Shaw](https://github.com/russleyshaw)
+- [user404d](https://github.com/user404d)
+- [Hannah Reinbolt](https://github.com/LoneGalaxy)
+- [Matthew Qualls](https://github.com/MatthewQualls)
+
+## Change Log
+
+View our [CHANGELOG.md](https://github.com/siggame/tourneyjs/blob/master/CHANGELOG.md)
+
+## License
+
+View our [LICENSE.md](https://github.com/siggame/colisee/blob/master/LICENSE.md)
+
+## Contributing
+
+View our [CONTRIBUTING.md](https://github.com/siggame/colisee/blob/master/CONTRIBUTING.md)# tourneyjs
