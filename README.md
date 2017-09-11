@@ -21,11 +21,14 @@ Tournament Algorithms
 
 ## Description
 
-A long description of the project.
+`tourneyjs` is a collection of different tournament algorithms along with the
+building blocks to create custom tournaments.
 
 ## Getting Started
 
-How to get/install the service or library.
+```bash
+ npm install --save @siggame/tourneyjs
+```
 
 ## Usage
 
@@ -36,61 +39,47 @@ import { SingleEliminationTournament } from "tourneyjs";
 
 // create single elimination tournament without bronze finals
 /**
- * SingleElimination( teams: any[], settings: Settings )
- * Settings : { with_bronze_final : boolean, randomize : boolean }
+ * SingleEliminationTournament( teams: any[], settings: Settings )
+ * Settings : { bronzeFinal : boolean, randomize : boolean }
 */
 
-const single_elim = new SingleEliminationTournament([ ... teams ... ]);
+const single_elim = new SingleEliminationTournament<T>([...teams]: T[]);
 
-// or with bronze finals
-
-/** 
- * const single_elim = new SingleElimination(
- * [ ... teams ... ],
- * {
- *     with_bronze_final: true,
- *     randomize: false
- * });
-*/
-
-// or with randomized seeding
-
-/** 
- * const single_elim = new SingleElimination(
- * [ ... teams ... ],
- * {
- *     with_bronze_final: false,
- *     randomize: true
- * });
-*/
-
-// add on_finished event listener
+// add finished event listener
 single_elim.when("finished", some_callback);
 
 // add error event listener
 single_elim.when("error", some_error_handler);
 
-/** 
+/**
  * Allow for asynchronous progress of the tournament.
  *
- * fight_cb(match) : Promise<{}>
+ * fight(match: Duel<T>) => Promise<IMatchResult<T>>
  *
- * needs to return the winner and loser of
- * a match (ie { winner: "bob", loser: "tom"})
+ * IMatchResult<T> = {
+ *  winner: T; losers: T[];
+ * }
  *
- * success_cb(match) : Void
+ * success(match: Duel<T>) => void
  *
- * will have the match with updated meta_data where the 
+ * will have the match with updated meta_data where the
  * result is stored
  *
- * failure_cb(match, error) : Void 
+ * failure(match: Duel<T>, error: any) => void
  *
  * will be called for each failure, but the error event
- * listener will only execute once. the match and error 
+ * listener will only execute once. the match and error
  * are parameters to the callback
-*/ 
+*/
 
-single_elim.play(fight_cb, success_cb, failure_cb);
+single_elim.play(
+    async (match) => {
+        // define how match winner should be decided
+    }, (match) => {
+        // get access to match after winner has been decided
+    }, (match, error) => {
+        // report or recover from error
+});
 
 single_elim.pause();
 single_elim.resume();
