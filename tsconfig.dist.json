@@ -3,14 +3,10 @@
         "declaration": true,
         "module": "commonjs",
         "outDir": "lib",
-        "rootDir": ".",
         "strict": true,
         "target": "es6"
     },
     "include": [
         "src/"
-    ],
-    "files": [
-        "index.ts"
     ]
 }

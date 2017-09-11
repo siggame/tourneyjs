@@ -8,7 +8,7 @@
     "build": "tsc",
     "build:dist": "tsc -p tsconfig.dist.json",
     "clean": "npm run clean:src && npm run clean:test && npm run clean:misc",
-    "clean:misc": "rimraf index.js lib/ node_modules/",
+    "clean:misc": "rimraf lib/ node_modules/",
     "clean:src": "rimraf src/*.js src/**/*.js",
     "clean:test": "rimraf test/*.js test/**/*.js",
     "lint": "tslint --format verbose --project ./tsconfig.json",
