@@ -27,10 +27,12 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
 export class SingleEliminationTournament<T> extends Tournament<T> {
 
   public teams: T[];
+  public playing: Duel<T>[];
+  public queued: Duel<T>[];
   private upperBracket: SingleEliminationBracket<T>;
-  private lowerBracket: SingleEliminationBracket<T>;
+  private lowerBracket?: SingleEliminationBracket<T>;
   private playTimer: NodeJS.Timer;
-  private playHandler: (match: IMatch<T>) => Promise<void>;
+  private playHandler: () => Promise<void>;
 
   constructor(
     teams: T[],
@@ -49,24 +51,28 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
 
     super((fight, success, error) => {
       // set up playing of tournament
-      this.playHandler = async (match: Duel<T>) => {
-        try {
-          match.metaData = await fight(match).catch((e) => error(match, e));
-          success(match);
-          match.update((next) => {
-            this.emit("play", next);
-          }, () => {
-            this.emit("finished", match.metaData.winner);
-          });
-        } catch (e) {
-          this.emit("error", match, e);
-        }
+      this.playHandler = async () => {
+        this.queued.forEach(async (match: Duel<T>) => {
+          try {
+            match.metaData = await fight(match).catch((e) => error(match, e));
+            success(match);
+            match.update((next: Duel<T>) => {
+              this.emit("enqueue", next);
+            }, () => {
+              this.emit("finished?");
+            });
+          } catch (e) {
+            this.emit("error", match, e);
+          }
+        });
+        this.playing.concat(this.queued);
       };
 
       this._play();
-      this.emit("begin");
     });
 
+    this.queued = [];
+    this.playing = [];
     this.upperBracket = new SingleEliminationBracket<T>(teams.length);
 
     // tie in bronze final if necessary    
@@ -82,7 +88,7 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
 
     //seed teams
 
-    teams.forEach((team, i) => {
+    (randomize ? permute(teams) : teams).forEach((team, i) => {
       // convert index to gray code
       let position = i ^ (i >> 1);
       let match = this.upperBracket.root;
@@ -94,11 +100,26 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
       }
 
       // add team to match found
-      match.teams.push(team);
-      this.once("begin", () => { this.playHandler(match); });
+      const teamCount = match.teams.push(team);
+      if (teamCount > 1) {
+        this.queued.push(match);
+      }
     });
 
-    this.on("error", (match: IMatch<T>, error: Error) => {
+    this.on("enqueue", (match: Duel<T>) => {
+      this.queued.push(match);
+    }).on("finished?", () => {
+      if (this.upperBracket.root.metaData) {
+        if (this.upperBracket.dep && this.upperBracket.dep.root.metaData) {
+          this.emit("finished", [this.upperBracket.root.metaData, this.upperBracket.dep.root.metaData]);
+        } else {
+          this.emit("finished", [this.upperBracket.root.metaData]);
+        }
+        this.queued = [];
+        this.playing = [];
+        this.stop();
+      }
+    }).on("error", (match: IMatch<T>, error: Error) => {
       this.pause();
       console.log(error.stack.toString());
     });
@@ -106,6 +127,10 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
 
   private _play(): void {
     this.on("play", this.playHandler);
+    this.playTimer = setInterval(() => {
+      this.playing = this.playing.filter((match) => !match.metaData);
+      this.emit("play");
+    }, 10);
     this.status = "playing";
   }
 
@@ -113,6 +138,7 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
     if (this.status === "paused") {
       return;
     }
+    clearInterval(this.playTimer);
     this.removeListener("play", this.playHandler);
     this.status = "paused";
   }
@@ -129,6 +155,7 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
 
   stop() {
     this.status = "stopped";
+    clearInterval(this.playTimer);
     this.removeAllListeners();
   }
 }

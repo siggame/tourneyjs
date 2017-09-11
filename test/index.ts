@@ -1,6 +1,6 @@
 import * as unit from "./unit";
 
-describe("Unit Tests", () => {
+describe("Unit Tests |", () => {
     unit.duel();
     unit.SEBracket();
     unit.SETournament();
