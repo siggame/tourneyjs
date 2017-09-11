@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "build": "tsc",
-    "clean": "rm index.js && npm run clean:src && npm run clean:test",
+    "clean": "npm run clean:src && npm run clean:test && npm run clean:misc",
+    "clean:misc": "rimraf -rf index.js node_modules/",
     "clean:src": "rimraf -rf src/*.js src/**/*.js",
     "clean:test": "rimraf -rf test/*.js test/**/*.js",
     "lint": "tslint --format verbose --project ./tsconfig.json",
