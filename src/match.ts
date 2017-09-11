@@ -1,34 +1,29 @@
-export class Match {
-  id: number;
-  teams: any[];
-  next: Match[];
-  deps: Match[];
-  meta_data: {};
+export interface IMatchUpdateHandler<T> {
+  (notify: (next: IMatch<T>) => void, finished: () => void): void;
+}
 
-  constructor(id: number) {
+export interface IMatch<T> {
+  id: number;
+  teams: T[];
+  next?: IMatch<T>[];
+  deps?: IMatch<T>[];
+  update: IMatchUpdateHandler<T>;
+}
+
+export interface IMatchResult<T> {
+  winner: T;
+  losers: T[];
+}
+
+export abstract class Match<T> implements IMatch<T> {
+  public teams: T[];
+  public next?: Match<T>[];
+  public deps?: Match<T>[];
+
+  constructor(public id: number) {
     this.id = id;
     this.teams = [];
-    this.next = null;
-    this.deps = null;
-    this.meta_data = null;
   }
 
-  public notify_next(ready, finished) {
-    if (this.next !== null) {
-      const winner = this.meta_data["winner"];
-      this.next[0].teams.push(winner);
-      if (this.next[1] !== undefined) {
-        const loser = this.meta_data["loser"];
-        this.next[1].teams.push(loser);
-      }
-      this.next.forEach((next_match) => {
-        if (next_match.teams.length > 1) {
-          ready(next_match);
-        }
-      });
-    }
-    else {
-      finished();
-    }
-  }
+  update: IMatchUpdateHandler<T> = () => { };
 }

@@ -1,0 +1,5 @@
+{
+    "extends": [
+        "@siggame/colisee-tslint/tslint.json"
+    ]
+}
