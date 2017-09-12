@@ -1,5 +1,5 @@
 import * as should from "should";
-import { Duel, IMatchResult, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../";
+import { Duel, IMatchResult, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../src";
 
 export default function () {
   describe("Single Elimination Tournament", function () {

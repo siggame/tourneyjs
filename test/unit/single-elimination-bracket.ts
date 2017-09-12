@@ -1,6 +1,6 @@
 import * as should from "should";
 
-import { SingleEliminationBracket } from "../../";
+import { SingleEliminationBracket } from "../../src";
 
 export default function () {
   describe("Single Elimination Bracket", () => {

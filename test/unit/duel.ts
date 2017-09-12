@@ -1,6 +1,6 @@
 import * as should from "should";
 
-import { Duel } from "../../";
+import { Duel } from "../../src";
 
 export default function () {
     describe("Duel", () => {
