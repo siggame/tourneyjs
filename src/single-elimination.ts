@@ -26,7 +26,6 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
 
   addLowerBracket() {
     this.dep = new SingleEliminationBracket<T>(2);
-    this.dep.root = this.root;
     if (this.root.deps) {
       this.root.deps.forEach((match) => {
         if (this.dep && match.next) { match.next.push(this.dep.root); }
@@ -145,17 +144,16 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
   private _checkFinished() {
     const { metaData: upper } = this.upperBracket.root;
     if (upper) {
-      if (this.upperBracket.dep) {
-        const { root: { metaData: lower } } = this.upperBracket.dep;
-        this.emit("finished", [upper, lower]);
-      } else {
+      if (!this.upperBracket.dep) {
         this.emit("finished", [upper]);
+      } else {
+        const { metaData: lower } = this.upperBracket.dep.root;
+        if (lower) { this.emit("finished", [upper, lower]); }
       }
-      this.pause();
     }
   }
 
-  private _error(match: IMatch<T>, error: Error) { this.pause(); }
+  private _error(match: Duel<T>, error: Error) { this.pause(); }
 
   private _play(): void {
     this.on("play", this.playHandler);

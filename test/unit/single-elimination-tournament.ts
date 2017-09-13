@@ -2,8 +2,8 @@ import * as should from "should";
 import { Duel, IMatchResult, ISingleEliminationSettings as ises, SingleEliminationTournament as single } from "../../src";
 
 export default function () {
+
   describe("Single Elimination Tournament", function () {
-    this.timeout(10000);
     const bronzeNoRand: ises = { bronzeFinal: true, randomize: false };
     const noBronzeRand: ises = { bronzeFinal: false, randomize: true };
     const bronzeRand: ises = { bronzeFinal: true, randomize: true };
@@ -32,10 +32,25 @@ export default function () {
     it("should allow bronze final", (done) => {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"], bronzeNoRand);
       t.when("finished", ([upper, lower]: IMatchResult<string>[]) => {
-        should(upper.winner).not.be.null;
+        should(upper.winner).not.be.undefined;
         should(upper.losers).be.lengthOf(1);
-        should(lower.winner).not.be.null;
+        should(lower.winner).not.be.undefined;
         should(lower.losers).be.lengthOf(1);
+        done();
+      });
+      t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
+        Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] }),
+        () => { },
+        () => { },
+      );
+    });
+
+    it("should only produce upper final result without bronze final", (done) => {
+      const t = new single(["abc", "def", "ghi", "lmn", "opq"], bronzeNoRand);
+      t.when("finished", ([upper, lower]: IMatchResult<string>[]) => {
+        should(upper.winner).not.be.undefined;
+        should(upper.losers).be.lengthOf(1);
+        should(lower).be.undefined;
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -48,7 +63,7 @@ export default function () {
     it("should allow randomization", (done) => {
       const teams = ["abc", "def", "ghi", "lmn", "opq"];
       const t = new single(teams, noBronzeRand);
-      should(t.teams).not.be.deepEqual(teams);
+      should(t.teams).not.be.equal(teams);
       done();
     });
 
@@ -210,4 +225,5 @@ export default function () {
       );
     });
   });
+
 }
