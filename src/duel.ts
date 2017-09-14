@@ -11,7 +11,7 @@ export class Duel<T> extends Match<T> implements IMatch<T> {
     public metaData?: DuelResult<T>;
     public next?: Duel<T>[];
 
-    constructor(id: number) {
+    constructor(id?: number) {
         super(id);
     }
 

@@ -31,8 +31,7 @@ export abstract class Match<T> implements IMatch<T> {
   public next?: IMatch<T>[];
   public teams: T[];
 
-  constructor(public id: number) {
-    this.id = id;
+  constructor(public id: number = -1) {
     this.teams = [];
   }
 

@@ -18,7 +18,7 @@ export default function () {
 
     it("should implement toString correctly", (done) => {
       const t = new SingleEliminationBracket(8);
-      should(t.toString()).equal("\t\t[ 6, ]\n\t[ 2, ]\n\t\t[ 5, ]\n[ 0, ]\n\t\t[ 4, ]\n\t[ 1, ]\n\t\t[ 3, ]");
+      should(t.toString()).equal("\t\t[ -1, ]\n\t[ -1, ]\n\t\t[ -1, ]\n[ -1, ]\n\t\t[ -1, ]\n\t[ -1, ]\n\t\t[ -1, ]");
       done();
     });
   });

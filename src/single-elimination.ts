@@ -11,7 +11,7 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
     super();
 
     const leaves = 2 ** Math.ceil(Math.log2(numTeams / 2));
-    this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => new Duel<T>(i));
+    this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => new Duel<T>());
 
     this.matches.forEach((match, i) => {
       if ((2 * i + 2) < this.matches.length) {
