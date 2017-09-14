@@ -1,6 +1,6 @@
 import { Bracket } from "./bracket";
 import { Duel } from "./duel";
-import { IMatch } from "./match";
+import { IMatch, Match } from "./match";
 import { ITournament, Tournament } from "./tournament";
 import { permute } from "./utilities";
 
@@ -9,7 +9,6 @@ export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: b
 export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
   constructor(numTeams: number) {
     super();
-
     const leaves = 2 ** Math.ceil(Math.log2(numTeams / 2));
     this.matches = Array(2 * leaves - 1).fill(null).map((_, i) => new Duel<T>());
 

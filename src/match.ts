@@ -2,6 +2,12 @@ export interface IMatchUpdateHandler<T> {
   (notify: (next: IMatch<T>) => void, finished: () => void): void;
 }
 
+export interface IMatchResult<T> {
+  losers: T[];
+  winner: T;
+  toString(buffer: number): string;
+}
+
 export interface IMatch<T> {
   deps?: IMatch<T>[];
   id: number;
@@ -10,12 +16,6 @@ export interface IMatch<T> {
   teams: T[];
   toString(): string;
   update: IMatchUpdateHandler<T>;
-}
-
-export interface IMatchResult<T> {
-  losers: T[];
-  winner: T;
-  toString(buffer: number): string;
 }
 
 export abstract class MatchResult<T> implements IMatchResult<T> {

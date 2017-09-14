@@ -1,13 +1,13 @@
 import { IMatch, Match } from "./match";
 
-export interface IBracket<T, U extends IMatch<T>> {
+export interface IBracket<T, U extends IMatch<T> = Match<T>> {
   root: U;
   dep?: IBracket<T, U>;
   matches: U[];
   toString(): string;
 }
 
-export abstract class Bracket<T, U extends Match<T>> implements IBracket<T, U> {
+export abstract class Bracket<T, U extends IMatch<T> = Match<T>> implements IBracket<T, U> {
   public root: U;
   public dep?: Bracket<T, U>;
   public matches: U[];
