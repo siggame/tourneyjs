@@ -1,10 +1,15 @@
-import { IMatch, IMatchResult, IMatchUpdateHandler, Match } from "./match";
+import { IMatch, IMatchResult, IMatchUpdateHandler, Match, MatchResult } from "./match";
+
+export class DuelResult<T> extends MatchResult<T> implements IMatchResult<T> {
+    constructor() {
+        super();
+    }
+}
 
 export class Duel<T> extends Match<T> implements IMatch<T> {
-
     public deps?: Duel<T>[];
+    public metaData?: DuelResult<T>;
     public next?: Duel<T>[];
-    public metaData?: IMatchResult<T>;
 
     constructor(id: number) {
         super(id);

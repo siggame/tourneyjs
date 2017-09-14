@@ -1,7 +1,7 @@
 import { Bracket } from "./bracket";
 import { Duel } from "./duel";
 import { IMatch } from "./match";
-import { Tournament } from "./tournament";
+import { ITournament, Tournament } from "./tournament";
 import { permute } from "./utilities";
 
 export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: boolean; }
@@ -74,14 +74,16 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
   }
 }
 
-export class SingleEliminationTournament<T> extends Tournament<T> {
+export class SingleEliminationTournament<T>
+  extends Tournament<T, Duel<T>, SingleEliminationBracket<T>>
+  implements ITournament<T, Duel<T>, SingleEliminationBracket<T>> {
 
+  public bracket: SingleEliminationBracket<T>;
   public playing: Duel<T>[];
   public queued: Duel<T>[];
   public teams: T[];
   private playTimer: NodeJS.Timer;
   private playHandler: () => Promise<void>;
-  private upperBracket: SingleEliminationBracket<T>;
 
   constructor(
     teams: T[],
@@ -129,12 +131,12 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
     this.playing = [];
     this.queued = [];
     this.teams = randomize ? permute(teams) : teams;
-    this.upperBracket = new SingleEliminationBracket<T>(teams.length);
+    this.bracket = new SingleEliminationBracket<T>(teams.length);
 
-    if (bronzeFinal) { this.upperBracket.addLowerBracket(); }
+    if (bronzeFinal) { this.bracket.addLowerBracket(); }
 
     // seed teams
-    this.queued = this.upperBracket.prepareMatches(this.teams);
+    this.queued = this.bracket.prepareMatches(this.teams);
 
     this.on("enqueue", (match: Duel<T>) => this.queued.push(match));
     this.on("finished?", this._checkFinished);
@@ -142,12 +144,12 @@ export class SingleEliminationTournament<T> extends Tournament<T> {
   }
 
   private _checkFinished() {
-    const { metaData: upper } = this.upperBracket.root;
+    const { metaData: upper } = this.bracket.root;
     if (upper) {
-      if (!this.upperBracket.dep) {
+      if (!this.bracket.dep) {
         this.emit("finished", [upper]);
       } else {
-        const { metaData: lower } = this.upperBracket.dep.root;
+        const { metaData: lower } = this.bracket.dep.root;
         if (lower) { this.emit("finished", [upper, lower]); }
       }
     }

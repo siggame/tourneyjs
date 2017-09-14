@@ -1,33 +1,38 @@
 import { EventEmitter } from "events";
 
-import { IMatchResult, Match } from "./match";
+import { IBracket } from "./bracket";
+import { IMatch, IMatchResult } from "./match";
 
 export type TournamentStatus = "init" | "playing" | "paused" | "stopped";
 export type TournamentEvents = "error" | "finished" | "ready";
 
 export interface ITournamentPlayHandler<T> {
     (
-        fight: (match: Match<T>) => Promise<IMatchResult<T>>,
-        success: (match: Match<T>) => void,
-        error: (match: Match<T>, error: Error) => any,
+        fight: (match: IMatch<T>) => Promise<IMatchResult<T>>,
+        success: (match: IMatch<T>) => void,
+        error: (match: IMatch<T>, error: Error) => any,
     )
         : void;
 }
 
-export interface ITournamentEventHandler<T> {
-    (event: TournamentEvents, cb: (...args: any[]) => any): Tournament<T>;
+export interface ITournamentEventHandler<T, U extends IMatch<T>, V extends IBracket<T, U>> {
+    (event: TournamentEvents, cb: (...args: any[]) => any): ITournament<T, U, V>;
 }
 
-export interface ITournament<T> {
+export interface ITournament<T, U extends IMatch<T>, V extends IBracket<T, U>> extends EventEmitter {
+    bracket: V;
     status: TournamentStatus;
     play: ITournamentPlayHandler<T>;
-    when: ITournamentEventHandler<T>;
+    when: ITournamentEventHandler<T, U, V>;
     pause(): void;
     resume(): void;
     stop(): void;
+    toString(): string;
 }
 
-export abstract class Tournament<T> extends EventEmitter implements ITournament<T>{
+export abstract class Tournament<T, U extends IMatch<T>, V extends IBracket<T, U>> extends EventEmitter implements ITournament<T, U, V>{
+
+    public bracket: V;
 
     constructor(
         public play: ITournamentPlayHandler<T> = () => { },
@@ -39,5 +44,6 @@ export abstract class Tournament<T> extends EventEmitter implements ITournament<
     pause(): void { }
     resume(): void { }
     stop(): void { }
-    when: ITournamentEventHandler<T> = (event, cb) => this.once(event, cb);
+    toString(): string { return `status: ${this.status}\n${this.bracket}`; }
+    when: ITournamentEventHandler<T, U, V> = (event, cb) => this.once(event, cb);
 }
