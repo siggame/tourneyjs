@@ -29,7 +29,7 @@ export interface ITournament<T, U extends IMatch<T> = Match<T>, V extends IBrack
 export abstract class Tournament<T, U extends IMatch<T> = Match<T>, V extends IBracket<T, U> = Bracket<T, U>>
     extends EventEmitter {
 
-    public readonly bracket: V;
+    public abstract bracket: V;
 
     constructor(
         public readonly play: ITournamentUpdateHandler<T, U>,
