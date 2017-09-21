@@ -84,7 +84,7 @@ export class SingleEliminationTournament<T>
 
   public readonly bracket: SingleEliminationBracket<T>;
   public playing: Duel<T>[];
-  public queued: Duel<T>[];
+  public readonly queued: Duel<T>[];
   public readonly teams: T[];
   private playTimer: NodeJS.Timer;
   private playHandler: () => Promise<void>;
@@ -125,7 +125,7 @@ export class SingleEliminationTournament<T>
         });
 
         this.playing.concat(this.queued);
-        this.queued = [];
+        this.queued.length = 0;
       };
 
       this.pause();
