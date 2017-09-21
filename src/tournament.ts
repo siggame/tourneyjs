@@ -26,6 +26,11 @@ export interface ITournament<T, U extends IMatch<T> = Match<T>, V extends IBrack
     toString(): string;
 }
 
+/**
+ * Base `Tournament`
+ * 
+ * @export
+ */
 export abstract class Tournament<T, U extends IMatch<T> = Match<T>, V extends IBracket<T, U> = Bracket<T, U>>
     extends EventEmitter {
 

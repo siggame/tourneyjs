@@ -1,11 +1,23 @@
 import { IMatch, IMatchResult, IMatchUpdateHandler, Match, MatchResult } from "./match";
 
+/**
+ * Implementation of `MatchResult`.
+ * 
+ * @export
+ */
 export class DuelResult<T> extends MatchResult<T> implements IMatchResult<T> {
     constructor() {
         super();
     }
 }
 
+/**
+ * A `Match` which pits opponents head to head meaning there is one
+ * winner and one loser. Optionally handles notifying a `Match` from a
+ * lower `Bracket`.
+ * 
+ * @export
+ */
 export class Duel<T> extends Match<T> implements IMatch<T> {
     public deps?: Duel<T>[];
     public metaData?: DuelResult<T>;

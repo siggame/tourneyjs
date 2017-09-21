@@ -6,6 +6,11 @@ import { permute } from "./utilities";
 
 export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: boolean; }
 
+/**
+ * Implementation of a single elimination `Bracket` with `Duel` style `Match`es.
+ * 
+ * @export
+ */
 export class SingleEliminationBracket<T>
   extends Bracket<T, Duel<T>>
   implements IBracket<T, Duel<T>>
@@ -77,6 +82,11 @@ export class SingleEliminationBracket<T>
   }
 }
 
+/**
+ * Implementation of a `Tournament` using a `SingleEliminationBracket`.
+ * 
+ * @export
+ */
 export class SingleEliminationTournament<T>
   extends Tournament<T, Duel<T>, SingleEliminationBracket<T>>
   implements ITournament<T, Duel<T>, SingleEliminationBracket<T>>

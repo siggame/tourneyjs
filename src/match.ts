@@ -18,6 +18,11 @@ export interface IMatch<T> {
   update: IMatchUpdateHandler<T>;
 }
 
+/**
+ * Base `MatchResult`
+ * 
+ * @export
+ */
 export abstract class MatchResult<T> {
   public losers: T[];
   public winner: T;
@@ -25,6 +30,11 @@ export abstract class MatchResult<T> {
   toString(buffer: number) { return `{ winner: ${this.winner} losers: ${this.losers} }`; }
 }
 
+/**
+ * Base `Match`
+ * 
+ * @export
+ */
 export abstract class Match<T> {
   public deps?: IMatch<T>[];
   public metaData?: IMatchResult<T>;

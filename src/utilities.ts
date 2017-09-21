@@ -1,4 +1,10 @@
-export function permute(list: any[]) {
+/**
+ * Creates a permutation (ie. random shuffle) of the input list.
+ * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+ * 
+ * @export
+ */
+export function permute(list: any[]): any[] {
   const permutation = Array.from(list);
   let window = permutation.length;
   let temp;
