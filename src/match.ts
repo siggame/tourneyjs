@@ -18,14 +18,14 @@ export interface IMatch<T> {
   update: IMatchUpdateHandler<T>;
 }
 
-export abstract class MatchResult<T> implements IMatchResult<T> {
+export abstract class MatchResult<T> {
   public losers: T[];
   public winner: T;
   constructor() { }
   toString(buffer: number) { return `{ winner: ${this.winner} losers: ${this.losers} }`; }
 }
 
-export abstract class Match<T> implements IMatch<T> {
+export abstract class Match<T> {
   public deps?: IMatch<T>[];
   public metaData?: IMatchResult<T>;
   public next?: IMatch<T>[];
@@ -36,5 +36,5 @@ export abstract class Match<T> implements IMatch<T> {
   }
 
   toString() { return `[ ${[this.id, this.metaData]} ]`; }
-  update: IMatchUpdateHandler<T> = () => { };
+  abstract update: IMatchUpdateHandler<T>;
 }
