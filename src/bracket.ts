@@ -7,7 +7,7 @@ export interface IBracket<T, U extends IMatch<T> = Match<T>> {
   toString(): string;
 }
 
-export abstract class Bracket<T, U extends IMatch<T> = Match<T>> implements IBracket<T, U> {
+export abstract class Bracket<T, U extends IMatch<T> = Match<T>> {
   public root: U;
   public dep?: Bracket<T, U>;
   public matches: U[];
