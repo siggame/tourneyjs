@@ -1,4 +1,4 @@
-import { Bracket } from "./bracket";
+import { Bracket, IBracket } from "./bracket";
 import { Duel } from "./duel";
 import { IMatch, Match } from "./match";
 import { ITournament, Tournament } from "./tournament";
@@ -6,7 +6,11 @@ import { permute } from "./utilities";
 
 export interface ISingleEliminationSettings { bronzeFinal: boolean; randomize: boolean; }
 
-export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
+export class SingleEliminationBracket<T>
+  extends Bracket<T, Duel<T>>
+  implements IBracket<T, Duel<T>>
+{
+
   constructor(numTeams: number) {
     super();
     const leaves = 2 ** Math.ceil(Math.log2(numTeams / 2));
@@ -75,12 +79,13 @@ export class SingleEliminationBracket<T> extends Bracket<T, Duel<T>> {
 
 export class SingleEliminationTournament<T>
   extends Tournament<T, Duel<T>, SingleEliminationBracket<T>>
-  implements ITournament<T, Duel<T>, SingleEliminationBracket<T>> {
+  implements ITournament<T, Duel<T>, SingleEliminationBracket<T>>
+{
 
-  public bracket: SingleEliminationBracket<T>;
+  public readonly bracket: SingleEliminationBracket<T>;
   public playing: Duel<T>[];
   public queued: Duel<T>[];
-  public teams: T[];
+  public readonly teams: T[];
   private playTimer: NodeJS.Timer;
   private playHandler: () => Promise<void>;
 
@@ -142,6 +147,26 @@ export class SingleEliminationTournament<T>
     this.on("error", this._error);
   }
 
+  pause() {
+    clearInterval(this.playTimer);
+    this.removeListener("play", this.playHandler);
+    this.status = "paused";
+  }
+
+  resume() {
+    if (this.status === "stopped") {
+      throw new Error("Tournament has been stopped.");
+    } else if (this.status === "paused") {
+      this._play();
+    }
+  }
+
+  stop() {
+    this.status = "stopped";
+    clearInterval(this.playTimer);
+    this.removeAllListeners();
+  }
+
   private _checkFinished() {
     const { metaData: upper } = this.bracket.root;
     if (upper) {
@@ -163,25 +188,5 @@ export class SingleEliminationTournament<T>
       this.emit("play");
     }, 0);
     this.status = "playing";
-  }
-
-  pause() {
-    clearInterval(this.playTimer);
-    this.removeListener("play", this.playHandler);
-    this.status = "paused";
-  }
-
-  resume() {
-    if (this.status === "stopped") {
-      throw new Error("Tournament has been stopped.");
-    } else if (this.status === "paused") {
-      this._play();
-    }
-  }
-
-  stop() {
-    this.status = "stopped";
-    clearInterval(this.playTimer);
-    this.removeAllListeners();
   }
 }
