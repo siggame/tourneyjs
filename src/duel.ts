@@ -15,7 +15,7 @@ export class Duel<T> extends Match<T> implements IMatch<T> {
         super(id);
     }
 
-    public update: IMatchUpdateHandler<T> =
+    public readonly update: IMatchUpdateHandler<T> =
     (notify, finished) => {
         if (this.next && this.metaData) {
             const [upper, lower] = this.next;
