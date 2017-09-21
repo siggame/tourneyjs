@@ -3,8 +3,6 @@
 .gitattributes
 .gitignore
 
-index.ts
-
 tsconfig.json
 tsconfig.dist.json
 tslint.json
