@@ -24,8 +24,8 @@ export interface IMatch<T> {
  * @export
  */
 export abstract class MatchResult<T> {
-  public losers: T[];
-  public winner: T;
+  public losers!: T[];
+  public winner!: T;
   constructor() { }
   toString(buffer: number) { return `{ winner: ${this.winner} losers: ${this.losers} }`; }
 }

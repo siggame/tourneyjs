@@ -13,15 +13,13 @@ export interface IBracket<T, U extends IMatch<T> = Match<T>> {
  * @export
  */
 export abstract class Bracket<T, U extends IMatch<T> = Match<T>> {
-  public root: U;
+  public root!: U;
   public dep?: Bracket<T, U>;
-  public matches: U[];
-
-  constructor() { }
+  public matches!: U[];
 
   toString() {
     const matchToString = (match: IMatch<T>, level: number): string => {
-      const [left, right] = match.deps || [undefined, undefined];
+      const [left, right] = match.deps == null ? [undefined, undefined] : match.deps;
       const currentMatch = `${Array(level).fill("\t").join("")}${match.toString()}`;
       if (left && right) {
         return `${matchToString(right, level + 1)}\n${currentMatch}\n${matchToString(left, level + 1)}`;

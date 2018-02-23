@@ -3,6 +3,7 @@
 .vscode/
 .vagrant/
 .env
+.nvmrc
 
 # Compiled files
 node_modules/

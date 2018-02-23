@@ -96,8 +96,8 @@ export class SingleEliminationTournament<T>
   public playing: Duel<T>[];
   public readonly queued: Duel<T>[];
   public readonly teams: T[];
-  private playTimer: NodeJS.Timer;
-  private playHandler: () => Promise<void>;
+  private playTimer!: NodeJS.Timer;
+  private playHandler!: () => Promise<void>;
 
   constructor(
     teams: T[],

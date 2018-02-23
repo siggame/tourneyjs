@@ -2,8 +2,8 @@
   "name": "@siggame/tourneyjs",
   "version": "0.3.2",
   "description": "Tournament Algorithms",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "lib",
+  "types": "lib",
   "scripts": {
     "build": "tsc",
     "build:dist": "tsc -p tsconfig.dist.json",
@@ -15,6 +15,8 @@
     "pretest": "npm run build",
     "setup": "npm install",
     "postsetup": "npm run build:dist",
+    "prepublishOnly": "npm install && npm run test && npm run build:dist",
+    "postpublish": "npm run clean",
     "test": "mocha --colors test/"
   },
   "repository": {
@@ -36,15 +38,15 @@
   },
   "homepage": "https://github.com/siggame/tourneyjs#readme",
   "devDependencies": {
-    "@siggame/colisee-tslint": "^1.0.3",
-    "@types/mocha": "^2.2.43",
+    "@siggame/colisee-tslint": "^1.0.4",
+    "@types/mocha": "^2.2.48",
     "@types/should": "^11.2.0",
-    "mocha": "^3.5.2",
-    "rimraf": "^2.6.1",
+    "mocha": "^3.5.3",
+    "rimraf": "^2.6.2",
     "should": "^11.2.1"
   },
   "dependencies": {
-    "@types/node": "^8.0.28",
-    "typescript": "^2.5.2"
+    "@types/node": "^8.9.4",
+    "typescript": "^2.7.2"
   }
 }
