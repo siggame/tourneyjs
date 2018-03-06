@@ -12,6 +12,7 @@ export default function () {
     it("should be constructible", (done) => {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"]);
       should(t).not.be.null;
+      t.stop();
       done();
     });
 
@@ -19,6 +20,7 @@ export default function () {
       const t = new single(["abc", "def", "ghi", "lmn", "opq"]);
       const twoPlayersOnly = t.queued.length === 2;
       twoPlayersOnly.should.be.true;
+      t.stop();
       done();
     });
 
@@ -27,6 +29,7 @@ export default function () {
       const t = new single(Array(numTeams).fill(null));
       const enoughMatches = t.queued.length === Math.floor(numTeams / 2);
       enoughMatches.should.be.true;
+      t.stop();
       done();
     });
 
@@ -37,6 +40,7 @@ export default function () {
         should(upper.losers).be.lengthOf(1);
         should(lower.winner).not.be.undefined;
         should(lower.losers).be.lengthOf(1);
+        t.stop();
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -52,6 +56,7 @@ export default function () {
         should(upper.winner).not.be.undefined;
         should(upper.losers).be.lengthOf(1);
         should(lower).be.undefined;
+        t.stop();
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -65,6 +70,7 @@ export default function () {
       const teams = ["abc", "def", "ghi", "lmn", "opq"];
       const t = new single(teams, noBronzeRand);
       should(t.teams).not.be.equal(teams);
+      t.stop();
       done();
     });
 
@@ -90,6 +96,7 @@ export default function () {
       const t = new single(Array(2).fill(null));
       t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
+        t.stop();
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -104,6 +111,7 @@ export default function () {
         , _ => { }, _ => { });
       should(t.playing).not.be.empty;
       t.on("finished", () => {
+        t.stop();
         done();
       });
     });
@@ -112,6 +120,7 @@ export default function () {
       const t = new single(Array(1000).fill(null), bronzeRand);
       t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
+        t.stop();
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -135,6 +144,7 @@ export default function () {
       const t = new single(Array(1000).fill(null));
       t.when("finished", ([upper, lower]) => {
         should(upper.winner).be.null;
+        t.stop();
         done();
       });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
@@ -192,17 +202,22 @@ export default function () {
         , (match) => {
           if (match.id === 20) throw new Error("borked");
         }, (match, err) => {
+          t.stop();
           done();
         });
       t.when("finished", () => {
         should(1).not.equal(1, "Tournament was able to finish despite being paused.");
+        t.stop();
         done();
       });
     });
 
     it("should recover tournament on error", (done) => {
       const t = new single(Array(1000).fill(null));
-      t.when("finished", () => done());
+      t.when("finished", () => {
+        t.stop();
+        done();
+      });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
         Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] })
         , match => {
@@ -218,7 +233,10 @@ export default function () {
 
     it("should finish tournament with more than 1/2 teams getting a bye", (done) => {
       const t = new single(Array(1025).fill(null));
-      t.when("finished", () => done());
+      t.when("finished", () => {
+        t.stop();
+        done();
+      });
       t.play((match, winner = Math.floor(Math.random() * 2) % 2) =>
         Promise.resolve({ winner: match.teams[winner], losers: [match.teams[winner ^ 1]] }),
         (match) => { },
