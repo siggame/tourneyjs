@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 import { Bracket, IBracket } from "./bracket";
-import { IMatch, IMatchResult, Match, MatchResult } from "./match";
+import { IMatch, IMatchResult, Match } from "./match";
 
 export type TournamentStatus = "init" | "playing" | "paused" | "stopped";
 export type TournamentEvents = "error" | "finished" | "ready";

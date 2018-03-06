@@ -1,6 +1,5 @@
 import { Bracket, IBracket } from "./bracket";
 import { Duel } from "./duel";
-import { IMatch, Match } from "./match";
 import { ITournament, Tournament } from "./tournament";
 import { permute } from "./utilities";
 
