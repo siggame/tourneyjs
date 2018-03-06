@@ -14,7 +14,6 @@
     "lint": "tslint --format verbose --project ./tsconfig.json",
     "pretest": "npm run build",
     "setup": "npm install",
-    "postsetup": "npm run build:dist",
     "prepublishOnly": "npm install && npm run test && npm run build:dist",
     "postpublish": "npm run clean",
     "test": "mocha --colors test/"
@@ -40,13 +39,12 @@
   "devDependencies": {
     "@siggame/colisee-tslint": "^1.0.4",
     "@types/mocha": "^2.2.48",
-    "@types/should": "^11.2.0",
-    "mocha": "^3.5.3",
+    "mocha": "^5.0.2",
     "rimraf": "^2.6.2",
-    "should": "^11.2.1"
+    "should": "^13.2.1"
   },
   "dependencies": {
-    "@types/node": "^8.9.4",
+    "@types/node": "^9.4.6",
     "typescript": "^2.7.2"
   }
 }

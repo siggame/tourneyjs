@@ -3,7 +3,6 @@
 Tournament Algorithms
 
 [![Travis](https://img.shields.io/travis/siggame/tourneyjs.svg?style=flat-square)](https://travis-ci.org/siggame/tourneyjs)
-[![Docker Pulls](https://img.shields.io/docker/pulls/siggame/tourneyjs.svg?style=flat-square)](https://hub.docker.com/r/siggame/tourneyjs/)
 [![GitHub Tag](https://img.shields.io/github/tag/siggame/tourneyjs.svg?style=flat-square)](https://github.com/siggame/tourneyjs/tags)
 [![Dependencies](https://img.shields.io/david/siggame/tourneyjs.svg)](https://github.com/siggame/tourneyjs)
 [![NPM Version](https://img.shields.io/npm/v/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
@@ -91,10 +90,7 @@ single_elim.resume();
 
 ## Contributors
 
-- [Russley Shaw](https://github.com/russleyshaw)
 - [user404d](https://github.com/user404d)
-- [Hannah Reinbolt](https://github.com/LoneGalaxy)
-- [Matthew Qualls](https://github.com/MatthewQualls)
 
 ## Change Log
 
@@ -102,7 +98,7 @@ View our [CHANGELOG.md](https://github.com/siggame/tourneyjs/blob/master/CHANGEL
 
 ## License
 
-View our [LICENSE.md](https://github.com/siggame/colisee/blob/master/LICENSE.md)
+View our [LICENSE](https://github.com/siggame/colisee/blob/master/LICENSE)
 
 ## Contributing
 
