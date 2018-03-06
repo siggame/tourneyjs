@@ -5,7 +5,7 @@ import utilities from "./utilities";
 
 export default () => {
 
-    describe("Unit Tests |", () => {
+    return describe("Unit Tests |", () => {
         duel();
         SEBracket();
         SETournament();

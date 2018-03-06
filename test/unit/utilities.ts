@@ -1,7 +1,9 @@
 import * as should from "should";
+
 import { permute } from "../../src/utilities";
 
 export default function () {
+
   describe("Permute", () => {
     it("should not alter original list", (done) => {
       const list = [1, 2, 3, 4, 5];
@@ -17,4 +19,5 @@ export default function () {
       done();
     });
   });
+
 }

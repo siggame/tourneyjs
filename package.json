@@ -16,7 +16,7 @@
     "setup": "npm install",
     "prepublishOnly": "npm install && npm run test && npm run build:dist",
     "postpublish": "npm run clean",
-    "test": "mocha --colors test/"
+    "test": "mocha --colors --exit test"
   },
   "repository": {
     "type": "git",

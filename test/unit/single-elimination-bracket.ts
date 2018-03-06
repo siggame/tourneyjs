@@ -3,6 +3,7 @@ import * as should from "should";
 import { SingleEliminationBracket } from "../../src";
 
 export default function () {
+
   describe("Single Elimination Bracket", () => {
     it("should be constructible", (done) => {
       const t = new SingleEliminationBracket(8);
@@ -22,4 +23,5 @@ export default function () {
       done();
     });
   });
+
 }
