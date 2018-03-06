@@ -4,7 +4,8 @@ Tournament Algorithms
 
 [![Travis](https://img.shields.io/travis/siggame/tourneyjs.svg?style=flat-square)](https://travis-ci.org/siggame/tourneyjs)
 [![GitHub Tag](https://img.shields.io/github/tag/siggame/tourneyjs.svg?style=flat-square)](https://github.com/siggame/tourneyjs/tags)
-[![Dependencies](https://img.shields.io/david/siggame/tourneyjs.svg)](https://github.com/siggame/tourneyjs)
+[![dependencies Status](https://david-dm.org/siggame/tourneyjs/status.svg?style=flat-square)](https://david-dm.org/siggame/tourneyjs)
+[![devDependencies Status](https://david-dm.org/siggame/tourneyjs/dev-status.svg?style=flat-square)](https://david-dm.org/siggame/tourneyjs?type=dev)
 [![NPM Version](https://img.shields.io/npm/v/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
 [![NPM Total Downloads](https://img.shields.io/npm/dt/@siggame/tourneyjs.svg?style=flat-square)](https://www.npmjs.com/package/@siggame/tourneyjs)
 
